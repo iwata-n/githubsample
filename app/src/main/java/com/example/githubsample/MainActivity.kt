@@ -16,17 +16,12 @@ import com.example.githubsample.ui.theme.GitHubSampleTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private val api = ApiModule.provideRepositorySearch()
+    // private val api = ApiModule.provideRepositorySearch()
+    private val api = ApiModule.provideGitHubApiService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            var owner by remember {
-                mutableStateOf("iwata-n")
-            }
-            var repo by remember {
-                mutableStateOf("wip")
-            }
             var query by remember {
                 mutableStateOf("query")
             }
@@ -71,18 +66,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    GitHubSampleTheme {
-        Greeting("Android")
     }
 }

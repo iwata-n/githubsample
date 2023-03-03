@@ -5,6 +5,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+import com.example.githubsample.FeatureFlag
+import com.example.githubsample.ReleaseFeatureFlag
 
 private val DarkColorPalette = darkColors(
     primary = Purple200,
@@ -27,8 +31,16 @@ private val LightColorPalette = lightColors(
     */
 )
 
+val LocalFeatureFlag = staticCompositionLocalOf<FeatureFlag> {
+    ReleaseFeatureFlag()
+}
+
 @Composable
-fun GitHubSampleTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+fun GitHubSampleTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    featureFlag: FeatureFlag = ReleaseFeatureFlag(),
+    content: @Composable () -> Unit
+) {
     val colors = if (darkTheme) {
         DarkColorPalette
     } else {
@@ -39,6 +51,11 @@ fun GitHubSampleTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Comp
         colors = colors,
         typography = Typography,
         shapes = Shapes,
-        content = content
-    )
+    ) {
+        CompositionLocalProvider(
+            LocalFeatureFlag provides featureFlag
+        ) {
+            content()
+        }
+    }
 }

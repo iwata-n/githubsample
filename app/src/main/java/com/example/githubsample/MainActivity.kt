@@ -3,16 +3,14 @@ package com.example.githubsample
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.githubsample.infra.remote.ApiModule
 import com.example.githubsample.ui.theme.GitHubSampleTheme
+import com.example.githubsample.ui.theme.LocalFeatureFlag
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -30,15 +28,16 @@ class MainActivity : ComponentActivity() {
             }
             val scope = rememberCoroutineScope()
 
-            GitHubSampleTheme {
+            GitHubSampleTheme(
+                featureFlag = Module.featureFlag(this)
+            ) {
+                val featureFlag = LocalFeatureFlag.current
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
                     Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         TextField(
                             value = query,
@@ -53,14 +52,19 @@ class MainActivity : ComponentActivity() {
                         Button(
                             onClick = {
                                 scope.launch {
-                                    val resp = api.searchRepositories(query)
-                                    response = resp.toString()
+                                    response = if (featureFlag.isEnable("use_mock_api")) {
+                                        "mock"
+                                    } else {
+                                        val resp = api.searchRepositories(query)
+                                        resp.toString()
+                                    }
                                 }
                             }
                         ) {
                             Text("search")
                         }
                         Text(response)
+                        FeatureFlagItems(flags = Module.flags)
                     }
 
                 }
